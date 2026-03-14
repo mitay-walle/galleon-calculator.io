@@ -1,0 +1,22 @@
+{
+  "name": "Harry Potter Currency Calculator",
+  "short_name": "HP Currency",
+  "description": "Калькулятор валют Гарри Поттера: галлеоны, сикли, кнаты",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#0b1020",
+  "theme_color": "#7c3aed",
+  "lang": "ru",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
