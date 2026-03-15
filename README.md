@@ -1,45 +1,45 @@
 # Galleon Calculator
 
-PWA-калькулятор валют из мира Гарри Поттера.
+A PWA calculator for currencies from the Harry Potter universe.
 
-Поддерживает три валюты:
+Supports three currencies:
 - **Galleons**
 - **Sickles**
 - **Knuts**
 
-Автоматическая конвертация:
+Automatic conversion:
 - 1 Galleon = **17 Sickles**
 - 1 Sickle = **29 Knuts**
 
-Баланс хранится локально на устройстве.
+The balance is stored locally on the device.
 
 ## Usage
 
-1. Выберите тип операции:
-   - **Add** — добавить к балансу  
-   - **Subtract** — списать  
-   - **Set** — установить баланс
+1. Select an operation:
+   - **Add** — add to the balance  
+   - **Subtract** — remove from the balance  
+   - **Set** — set the balance directly
 
-2. Введите сумму в галлеонах, сиклях или кнатах.
+2. Enter the amount in Galleons, Sickles, or Knuts.
 
-3. Нажмите **Apply**.
+3. Press **Apply**.
 
-Баланс автоматически:
-- конвертируется между всеми валютами
-- сохраняется в браузере
-- добавляется в историю операций.
+The balance will automatically:
+- convert between all currencies
+- be saved in the browser
+- be added to the operation history.
 
 ## Install (PWA)
 
-На телефоне можно установить как приложение:
+You can install the site as an app on your phone:
 
-1. Откройте сайт.
-2. В меню браузера выберите **Add to Home Screen**.
+1. Open the website.
+2. In the browser menu choose **Add to Home Screen**.
 
-После установки калькулятор работает как отдельное приложение и доступен офлайн.
+After installation the calculator works like a standalone app and can run offline.
 
 ## Data
 
-- данные сохраняются в **localStorage**
-- история хранится локально
-- интернет не требуется после загрузки
+- data is stored in **localStorage**
+- history is stored locally
+- internet connection is not required after the first load
