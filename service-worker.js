@@ -1,4 +1,4 @@
-const CACHE = "hp-currency-pwa-v2";
+const CACHE = "hp-currency-pwa-v1";
 const ASSETS = [
   "./",
   "./index.html",
