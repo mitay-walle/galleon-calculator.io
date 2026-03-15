@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Calculator, Coins, RotateCcw, Save, Trash2, Wand2 } from "lucide-react";
+import { Calculator, Coins, RotateCcw, Save, Trash2, Wand2, Languages } from "lucide-react";
 
 const KNUTS_IN_SICKLE = 29;
 const SICKLES_IN_GALLEON = 17;
@@ -19,6 +19,9 @@ const translations = {
     wizardingBank: "Wizarding Bank",
     title: "Калькулятор валют Гарри Поттера",
     subtitle: "Простые операции с балансом, автоматическая конвертация и сохранение прямо в браузере.",
+    language: "Язык",
+    langRu: "Русский",
+    langEn: "English",
     resetInput: "Сброс ввода",
     clearAll: "Очистить всё",
     balanceInGalleons: "Баланс в галлеонах",
@@ -50,13 +53,15 @@ const translations = {
     newBalance: "Новый баланс",
     decimalGalleons: "гал.",
     decimalSickles: "сик.",
-    decimalKnuts: "кн.",
-    language: "Язык"
+    decimalKnuts: "кн."
   },
   en: {
     wizardingBank: "Wizarding Bank",
     title: "Harry Potter Currency Calculator",
     subtitle: "Simple balance operations, automatic conversion, and browser storage.",
+    language: "Language",
+    langRu: "Русский",
+    langEn: "English",
     resetInput: "Reset input",
     clearAll: "Clear all",
     balanceInGalleons: "Balance in Galleons",
@@ -88,8 +93,7 @@ const translations = {
     newBalance: "New balance",
     decimalGalleons: "gal.",
     decimalSickles: "sic.",
-    decimalKnuts: "kn.",
-    language: "Language"
+    decimalKnuts: "kn."
   }
 };
 
@@ -117,10 +121,11 @@ function fromKnuts(totalKnuts) {
   };
 }
 
-function formatTriplet(totalKnuts) {
+function formatTriplet(totalKnuts, lang) {
   const sign = totalKnuts < 0 ? "−" : "";
   const parts = fromKnuts(totalKnuts);
-  return `${sign}${Math.abs(parts.galleons)} г ${Math.abs(parts.sickles)} с ${Math.abs(parts.knuts)} к`;
+  const t = translations[lang];
+  return `${sign}${Math.abs(parts.galleons)} ${t.galleons[0].toLowerCase()} ${Math.abs(parts.sickles)} ${t.sickles[0].toLowerCase()} ${Math.abs(parts.knuts)} ${t.knuts[0].toLowerCase()}`;
 }
 
 function formatDecimal(totalKnuts, divisor, digits = 2) {
@@ -141,8 +146,8 @@ function StatCard({ title, value, caption }) {
 
 export default function HarryPotterCurrencyCalculator() {
   const [balanceKnuts, setBalanceKnuts] = useState(0);
-  const [language, setLanguage] = useState("ru");
   const [mode, setMode] = useState("add");
+  const [language, setLanguage] = useState("ru");
   const [galleons, setGalleons] = useState("0");
   const [sickles, setSickles] = useState("0");
   const [knuts, setKnuts] = useState("0");
@@ -207,7 +212,7 @@ export default function HarryPotterCurrencyCalculator() {
       type,
       amount,
       result,
-      time: new Date().toLocaleString(),
+      time: new Date().toLocaleString(language === "ru" ? "ru-RU" : "en-US"),
     };
     setHistory((prev) => [next, ...prev].slice(0, 8));
   }
@@ -258,15 +263,16 @@ export default function HarryPotterCurrencyCalculator() {
                   </p>
                 </div>
                 <div className="flex flex-wrap gap-2">
-                  <div className="flex items-center gap-2 rounded-2xl border px-3 py-2 text-sm">
-                    <span className="text-muted-foreground">{t.language}:</span>
+                  <div className="flex items-center gap-2 rounded-2xl border bg-background/70 px-3 py-2 text-sm backdrop-blur">
+                    <Languages className="h-4 w-4" />
+                    <span className="text-muted-foreground">{t.language}</span>
                     <select
                       value={language}
                       onChange={(e) => setLanguage(e.target.value)}
-                      className="bg-transparent outline-none"
+                      className="rounded-md bg-transparent outline-none"
                     >
-                      <option value="ru">Русский</option>
-                      <option value="en">English</option>
+                      <option value="ru">{t.langRu}</option>
+                      <option value="en">{t.langEn}</option>
                     </select>
                   </div>
                   <Button variant="outline" className="rounded-2xl" onClick={resetInputs}>
@@ -306,7 +312,7 @@ export default function HarryPotterCurrencyCalculator() {
                     <div>
                       <div className="text-sm text-muted-foreground">{t.normalizedBalance}</div>
                       <div className="mt-1 text-3xl font-semibold tracking-tight">
-                        {formatTriplet(balanceKnuts)}
+                        {formatTriplet(balanceKnuts, language)}
                       </div>
                     </div>
                     <Badge className="rounded-full px-3 py-1 text-sm" variant="secondary">
@@ -373,7 +379,7 @@ export default function HarryPotterCurrencyCalculator() {
 
               <div className="rounded-2xl border bg-muted/30 p-4">
                 <div className="text-sm text-muted-foreground">{t.enteredAmount}</div>
-                <div className="mt-1 text-xl font-semibold">{formatTriplet(enteredKnuts)}</div>
+                <div className="mt-1 text-xl font-semibold">{formatTriplet(enteredKnuts, language)}</div>
                 <div className="mt-2 grid grid-cols-3 gap-2 text-sm text-muted-foreground">
                   <div>{formatDecimal(enteredKnuts, KNUTS_IN_GALLEON, 2)} {t.decimalGalleons}</div>
                   <div>{formatDecimal(enteredKnuts, KNUTS_IN_SICKLE, 2)} {t.decimalSickles}</div>
@@ -420,10 +426,10 @@ export default function HarryPotterCurrencyCalculator() {
                         </Badge>
                       </div>
                       <div className="mt-2 text-sm text-muted-foreground">
-                        {t.amount}: {formatTriplet(item.amount)}
+                        {t.amount}: {formatTriplet(item.amount, language)}
                       </div>
                       <div className="text-sm text-muted-foreground">
-                        {t.newBalance}: {formatTriplet(item.result)}
+                        {t.newBalance}: {formatTriplet(item.result, language)}
                       </div>
                     </div>
                   ))}
@@ -436,4 +442,4 @@ export default function HarryPotterCurrencyCalculator() {
     </div>
   );
 }
-                  
+    
