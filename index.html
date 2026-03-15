@@ -1,45 +1,32 @@
 <!doctype html>
-<html lang="ru">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <meta name="theme-color" content="#7c3aed" />
-  <meta name="description" content="PWA-калькулятор валют Гарри Поттера" />
-  <title>HP Currency Calculator</title>
+  <meta name="description" content="Harry Potter currency calculator PWA" />
+  <title>Galleon Calculator</title>
   <link rel="manifest" href="manifest.json" />
   <style>
     :root {
-      --bg: #0b1020;
-      --card: rgba(20, 26, 48, 0.86);
-      --card-2: rgba(30, 38, 67, 0.72);
-      --text: #f8f7ff;
-      --muted: #b9b7d9;
-      --accent: #a78bfa;
-      --accent-2: #f59e0b;
-      --danger: #ef4444;
-      --ok: #22c55e;
-      --border: rgba(255,255,255,0.09);
-      --shadow: 0 10px 30px rgba(0,0,0,.28);
-      --radius: 22px;
+      --bg: #0b1020; --card: rgba(20, 26, 48, 0.88); --card-2: rgba(30, 38, 67, 0.72);
+      --text: #f8f7ff; --muted: #b9b7d9; --accent: #a78bfa; --accent-2: #f59e0b;
+      --danger: #ef4444; --ok: #22c55e; --border: rgba(255,255,255,.09); --shadow: 0 10px 30px rgba(0,0,0,.28);
     }
     * { box-sizing: border-box; }
-    html, body { margin: 0; min-height: 100%; font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, sans-serif; background:
-      radial-gradient(circle at top, #2a1f53 0%, #11182e 38%, #090d18 100%);
-      color: var(--text); }
+    html, body {
+      margin: 0; min-height: 100%; font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+      background: radial-gradient(circle at top, #2a1f53 0%, #11182e 38%, #090d18 100%); color: var(--text);
+    }
     body { padding: 18px; }
     .wrap { max-width: 1080px; margin: 0 auto; display: grid; gap: 18px; }
     .hero, .card { border: 1px solid var(--border); background: var(--card); border-radius: 28px; box-shadow: var(--shadow); backdrop-filter: blur(10px); }
     .hero { overflow: hidden; }
-    .hero-top {
-      padding: 22px;
-      background: linear-gradient(135deg, rgba(167,139,250,.22), rgba(245,158,11,.18));
-      border-bottom: 1px solid var(--border);
-    }
+    .hero-top { padding: 22px; background: linear-gradient(135deg, rgba(167,139,250,.22), rgba(245,158,11,.18)); border-bottom: 1px solid var(--border); }
     .hero-top h1 { margin: 10px 0 8px; font-size: clamp(28px, 5vw, 42px); line-height: 1.06; }
     .hero-top p { margin: 0; color: var(--muted); }
     .badge {
-      display: inline-flex; align-items: center; gap: 8px;
-      padding: 8px 12px; border-radius: 999px; font-size: 13px;
+      display: inline-flex; align-items: center; gap: 8px; padding: 8px 12px; border-radius: 999px; font-size: 13px;
       background: rgba(255,255,255,.08); border: 1px solid var(--border);
     }
     .grid { display: grid; gap: 18px; }
@@ -48,42 +35,34 @@
     .triplet { grid-template-columns: repeat(3, 1fr); }
     .card { padding: 18px; }
     .stat-value { font-size: 30px; font-weight: 700; margin-top: 6px; }
-    .label, .hint, .small { color: var(--muted); }
+    .label, .small { color: var(--muted); }
     .small { font-size: 13px; }
     .balance-big { font-size: clamp(28px, 5vw, 40px); font-weight: 800; margin-top: 6px; }
     .row { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
     .row-between { display:flex; justify-content: space-between; align-items:center; gap: 12px; flex-wrap: wrap; }
     .tabs { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; }
-    .tab, button {
-      border: 1px solid var(--border);
-      background: var(--card-2);
-      color: var(--text);
-      border-radius: 18px;
-      min-height: 48px;
-      padding: 12px 16px;
-      font: inherit;
+    .tab, button, select {
+      border: 1px solid var(--border); background: var(--card-2); color: var(--text);
+      border-radius: 18px; min-height: 48px; padding: 12px 16px; font: inherit;
     }
     .tab.active { background: linear-gradient(135deg, rgba(167,139,250,.24), rgba(245,158,11,.16)); border-color: rgba(167,139,250,.5); }
     input {
-      width: 100%; min-height: 48px;
-      border-radius: 18px; border: 1px solid var(--border);
-      background: rgba(255,255,255,.05); color: var(--text);
-      padding: 12px 14px; font: inherit;
+      width: 100%; min-height: 48px; border-radius: 18px; border: 1px solid var(--border);
+      background: rgba(255,255,255,.05); color: var(--text); padding: 12px 14px; font: inherit;
     }
     .inputs { display: grid; gap: 12px; grid-template-columns: repeat(3, 1fr); }
     .section-title { font-size: 22px; font-weight: 700; margin: 0 0 14px; }
     .action-primary { background: linear-gradient(135deg, rgba(167,139,250,.32), rgba(245,158,11,.22)); }
     .action-danger { background: rgba(239,68,68,.14); }
     .preview, .history-item, .mini-card {
-      border: 1px solid var(--border);
-      background: rgba(255,255,255,.04);
-      border-radius: 20px;
-      padding: 14px;
+      border: 1px solid var(--border); background: rgba(255,255,255,.04); border-radius: 20px; padding: 14px;
     }
     .history { display: grid; gap: 10px; }
     .status { font-size: 13px; color: var(--ok); }
     .status.offline { color: var(--accent-2); }
     .footer-note { text-align: center; color: var(--muted); font-size: 13px; padding-bottom: 10px; }
+    .lang-wrap { display: flex; align-items: center; gap: 8px; }
+    .muted-btn { background: rgba(255,255,255,.06); }
     @media (max-width: 860px) {
       .main, .stats, .triplet, .inputs { grid-template-columns: 1fr; }
       body { padding: 12px; }
@@ -96,30 +75,18 @@
       <div class="hero-top">
         <div class="row-between">
           <div>
-            <div class="badge">⚡ Wizarding Bank</div>
-            <h1>Калькулятор валют Гарри Поттера</h1>
-            <p>Галлеоны, сикли и кнаты. Простые операции, история и сохранение баланса.</p>
+            <div class="badge" id="wizardingBank">⚡ Wizarding Bank</div>
+            <h1 id="pageTitle">Harry Potter Currency Calculator</h1>
+            <p id="pageSubtitle">Simple balance operations, automatic conversion, and browser storage.</p>
           </div>
-          <div class="badge" id="installHint">📲 Можно установить на главный экран</div>
+          <div class="badge" id="installHint">📲 Add to Home Screen</div>
         </div>
       </div>
       <div class="card" style="margin: 18px;">
         <div class="grid stats">
-          <div class="mini-card">
-            <div class="label">Баланс в галлеонах</div>
-            <div class="stat-value" id="balanceGalleons">0.00</div>
-            <div class="small">1 галлеон = 17 сиклей = 493 кната</div>
-          </div>
-          <div class="mini-card">
-            <div class="label">Баланс в сиклях</div>
-            <div class="stat-value" id="balanceSickles">0.00</div>
-            <div class="small">1 сикль = 29 кнатов</div>
-          </div>
-          <div class="mini-card">
-            <div class="label">Баланс в кнатах</div>
-            <div class="stat-value" id="balanceKnuts">0</div>
-            <div class="small">Базовая единица хранения</div>
-          </div>
+          <div class="mini-card"><div class="label" id="balanceInGalleonsLabel">Balance in Galleons</div><div class="stat-value" id="balanceGalleons">0.00</div><div class="small" id="galleonRate">1 Galleon = 17 Sickles = 493 Knuts</div></div>
+          <div class="mini-card"><div class="label" id="balanceInSicklesLabel">Balance in Sickles</div><div class="stat-value" id="balanceSickles">0.00</div><div class="small" id="sickleRate">1 Sickle = 29 Knuts</div></div>
+          <div class="mini-card"><div class="label" id="balanceInKnutsLabel">Balance in Knuts</div><div class="stat-value" id="balanceKnuts">0</div><div class="small" id="baseUnit">Base storage unit</div></div>
         </div>
       </div>
     </section>
@@ -127,256 +94,200 @@
     <section class="grid main">
       <div class="card">
         <div class="row-between">
-          <h2 class="section-title">Баланс</h2>
-          <div class="status" id="onlineStatus">Онлайн</div>
+          <h2 class="section-title" id="balanceTitle">Balance</h2>
+          <div class="status" id="onlineStatus">Online</div>
         </div>
         <div class="preview">
-          <div class="label">Нормализованный баланс</div>
-          <div class="balance-big" id="normalizedBalance">0 г 0 с 0 к</div>
+          <div class="label" id="normalizedBalanceLabel">Normalized balance</div>
+          <div class="balance-big" id="normalizedBalance">0 g 0 s 0 k</div>
           <div class="grid triplet" style="margin-top: 14px;">
-            <div class="mini-card"><div class="label">Галлеоны</div><div class="stat-value" id="normG">0</div></div>
-            <div class="mini-card"><div class="label">Сикли</div><div class="stat-value" id="normS">0</div></div>
-            <div class="mini-card"><div class="label">Кнаты</div><div class="stat-value" id="normK">0</div></div>
+            <div class="mini-card"><div class="label" id="galleonsLabel">Galleons</div><div class="stat-value" id="normG">0</div></div>
+            <div class="mini-card"><div class="label" id="sicklesLabel">Sickles</div><div class="stat-value" id="normS">0</div></div>
+            <div class="mini-card"><div class="label" id="knutsLabel">Knuts</div><div class="stat-value" id="normK">0</div></div>
           </div>
         </div>
       </div>
 
       <div class="card">
-        <h2 class="section-title">Операция</h2>
+        <div class="row-between">
+          <h2 class="section-title" id="operationTitle">Operation</h2>
+          <div class="lang-wrap">
+            <span class="small" id="languageLabel">Language</span>
+            <select id="languageSelect"><option value="ru">Русский</option><option value="en">English</option></select>
+          </div>
+        </div>
         <div class="tabs">
-          <button class="tab active" data-mode="add">Пополнить</button>
-          <button class="tab" data-mode="subtract">Списать</button>
-          <button class="tab" data-mode="set">Установить</button>
+          <button class="tab active" data-mode="add" id="tabAdd">Add</button>
+          <button class="tab" data-mode="subtract" id="tabSubtract">Subtract</button>
+          <button class="tab" data-mode="set" id="tabSet">Set</button>
         </div>
-
         <div class="inputs" style="margin-top: 14px;">
-          <div>
-            <div class="small" style="margin-bottom: 6px;">Галлеоны</div>
-            <input id="inputG" inputmode="numeric" value="0" />
-          </div>
-          <div>
-            <div class="small" style="margin-bottom: 6px;">Сикли</div>
-            <input id="inputS" inputmode="numeric" value="0" />
-          </div>
-          <div>
-            <div class="small" style="margin-bottom: 6px;">Кнаты</div>
-            <input id="inputK" inputmode="numeric" value="0" />
-          </div>
+          <div><div class="small" style="margin-bottom: 6px;" id="inputGLabel">Galleons</div><input id="inputG" inputmode="numeric" value="0" /></div>
+          <div><div class="small" style="margin-bottom: 6px;" id="inputSLabel">Sickles</div><input id="inputS" inputmode="numeric" value="0" /></div>
+          <div><div class="small" style="margin-bottom: 6px;" id="inputKLabel">Knuts</div><input id="inputK" inputmode="numeric" value="0" /></div>
         </div>
-
         <div class="preview" style="margin-top: 14px;">
-          <div class="label">Введённая сумма</div>
-          <div class="stat-value" id="enteredTriplet">0 г 0 с 0 к</div>
+          <div class="label" id="enteredAmountLabel">Entered amount</div>
+          <div class="stat-value" id="enteredTriplet">0 g 0 s 0 k</div>
           <div class="row small" style="margin-top: 6px;">
-            <div id="enteredAsG">0.00 гал.</div>
-            <div id="enteredAsS">0.00 сик.</div>
-            <div id="enteredAsK">0 кн.</div>
+            <div id="enteredAsG">0.00 gal.</div><div id="enteredAsS">0.00 sic.</div><div id="enteredAsK">0 kn.</div>
           </div>
         </div>
-
         <div class="row" style="margin-top: 14px;">
-          <button id="applyBtn" class="action-primary" style="flex: 1;">Применить</button>
-          <button id="resetBtn">Сброс ввода</button>
-          <button id="clearBtn" class="action-danger">Очистить всё</button>
+          <button id="applyBtn" class="action-primary" style="flex: 1;">Apply</button>
+          <button id="resetBtn" class="muted-btn">Reset input</button>
+          <button id="clearBtn" class="action-danger">Clear all</button>
         </div>
       </div>
     </section>
 
     <section class="card">
-      <h2 class="section-title">Последние операции</h2>
+      <h2 class="section-title" id="historyTitle">Recent operations</h2>
       <div id="history" class="history"></div>
     </section>
 
-    <div class="footer-note">Данные сохраняются локально на устройстве.</div>
+    <div class="footer-note" id="footerNote">Data is stored locally on the device.</div>
   </div>
 
   <script>
-    const KNUTS_IN_SICKLE = 29;
-    const SICKLES_IN_GALLEON = 17;
-    const KNUTS_IN_GALLEON = KNUTS_IN_SICKLE * SICKLES_IN_GALLEON;
-    const STORAGE_KEY = "hp-currency-balance-v1";
-    const HISTORY_KEY = "hp-currency-history-v1";
+    const KNUTS_IN_SICKLE = 29, SICKLES_IN_GALLEON = 17, KNUTS_IN_GALLEON = KNUTS_IN_SICKLE * SICKLES_IN_GALLEON;
+    const STORAGE_KEY = "hp-currency-balance-v1", HISTORY_KEY = "hp-currency-history-v1", LANGUAGE_KEY = "hp-currency-language-v1";
+
+    const translations = {
+      ru: {
+        htmlLang: "ru", wizardingBank: "⚡ Wizarding Bank", title: "Калькулятор валют Гарри Поттера",
+        subtitle: "Простые операции с балансом, автоматическая конвертация и сохранение прямо в браузере.",
+        installHint: "📲 Добавить на главный экран", balanceTitle: "Баланс", balanceInGalleons: "Баланс в галлеонах",
+        balanceInSickles: "Баланс в сиклях", balanceInKnuts: "Баланс в кнатах", galleonRate: "1 галлеон = 17 сиклей = 493 кната",
+        sickleRate: "1 сикль = 29 кнатов", baseUnit: "Базовая единица хранения", normalizedBalance: "Нормализованный баланс",
+        galleons: "Галлеоны", sickles: "Сикли", knuts: "Кнаты", operation: "Операция", language: "Язык",
+        add: "Пополнить", subtract: "Списать", set: "Установить", enteredAmount: "Введённая сумма",
+        addToBalance: "Добавить к балансу", subtractFromBalance: "Списать с баланса", setBalance: "Установить баланс",
+        resetInput: "Сброс ввода", clearAll: "Очистить всё", historyTitle: "Последние операции", historyEmpty: "История пока пустая.",
+        amount: "Сумма", newBalance: "Новый баланс", addOp: "Пополнение", subtractOp: "Списание", setOp: "Установка баланса",
+        footerNote: "Данные сохраняются локально на устройстве.", online: "Онлайн", offline: "Офлайн",
+        decimalGalleons: "гал.", decimalSickles: "сик.", decimalKnuts: "кн.", unitG: "г", unitS: "с", unitK: "к"
+      },
+      en: {
+        htmlLang: "en", wizardingBank: "⚡ Wizarding Bank", title: "Harry Potter Currency Calculator",
+        subtitle: "Simple balance operations, automatic conversion, and browser storage.",
+        installHint: "📲 Add to Home Screen", balanceTitle: "Balance", balanceInGalleons: "Balance in Galleons",
+        balanceInSickles: "Balance in Sickles", balanceInKnuts: "Balance in Knuts", galleonRate: "1 Galleon = 17 Sickles = 493 Knuts",
+        sickleRate: "1 Sickle = 29 Knuts", baseUnit: "Base storage unit", normalizedBalance: "Normalized balance",
+        galleons: "Galleons", sickles: "Sickles", knuts: "Knuts", operation: "Operation", language: "Language",
+        add: "Add", subtract: "Subtract", set: "Set", enteredAmount: "Entered amount",
+        addToBalance: "Add to balance", subtractFromBalance: "Subtract from balance", setBalance: "Set balance",
+        resetInput: "Reset input", clearAll: "Clear all", historyTitle: "Recent operations", historyEmpty: "History is empty.",
+        amount: "Amount", newBalance: "New balance", addOp: "Deposit", subtractOp: "Withdrawal", setOp: "Set balance",
+        footerNote: "Data is stored locally on the device.", online: "Online", offline: "Offline",
+        decimalGalleons: "gal.", decimalSickles: "sic.", decimalKnuts: "kn.", unitG: "g", unitS: "s", unitK: "k"
+      }
+    };
 
     let mode = "add";
     let balanceKnuts = parseInt(localStorage.getItem(STORAGE_KEY) || "0", 10) || 0;
     let history = [];
     try { history = JSON.parse(localStorage.getItem(HISTORY_KEY) || "[]"); } catch { history = []; }
+    let language = localStorage.getItem(LANGUAGE_KEY) || "ru";
+    if (!translations[language]) language = "ru";
 
-    const els = {
-      balanceGalleons: document.getElementById("balanceGalleons"),
-      balanceSickles: document.getElementById("balanceSickles"),
-      balanceKnuts: document.getElementById("balanceKnuts"),
-      normalizedBalance: document.getElementById("normalizedBalance"),
-      normG: document.getElementById("normG"),
-      normS: document.getElementById("normS"),
-      normK: document.getElementById("normK"),
-      inputG: document.getElementById("inputG"),
-      inputS: document.getElementById("inputS"),
-      inputK: document.getElementById("inputK"),
-      enteredTriplet: document.getElementById("enteredTriplet"),
-      enteredAsG: document.getElementById("enteredAsG"),
-      enteredAsS: document.getElementById("enteredAsS"),
-      enteredAsK: document.getElementById("enteredAsK"),
-      history: document.getElementById("history"),
-      onlineStatus: document.getElementById("onlineStatus"),
-      installHint: document.getElementById("installHint"),
-      applyBtn: document.getElementById("applyBtn")
-    };
+    const el = {};
+    [
+      "wizardingBank","pageTitle","pageSubtitle","installHint","balanceTitle","balanceInGalleonsLabel","balanceInSicklesLabel",
+      "balanceInKnutsLabel","galleonRate","sickleRate","baseUnit","normalizedBalanceLabel","galleonsLabel","sicklesLabel",
+      "knutsLabel","operationTitle","languageLabel","languageSelect","tabAdd","tabSubtract","tabSet","inputGLabel","inputSLabel",
+      "inputKLabel","enteredAmountLabel","applyBtn","resetBtn","clearBtn","historyTitle","history","footerNote","onlineStatus",
+      "balanceGalleons","balanceSickles","balanceKnuts","normalizedBalance","normG","normS","normK","inputG","inputS","inputK",
+      "enteredTriplet","enteredAsG","enteredAsS","enteredAsK"
+    ].forEach(id => el[id] = document.getElementById(id));
 
-    function clampInt(value) {
-      const n = parseInt(String(value).replace(/[^\d-]/g, ""), 10);
-      return Number.isFinite(n) ? n : 0;
-    }
-    function toKnuts(g, s, k) {
-      return clampInt(g) * KNUTS_IN_GALLEON + clampInt(s) * KNUTS_IN_SICKLE + clampInt(k);
-    }
+    function t() { return translations[language]; }
+    function clampInt(value) { const n = parseInt(String(value).replace(/[^\d-]/g, ""), 10); return Number.isFinite(n) ? n : 0; }
+    function toKnuts(g, s, k) { return clampInt(g) * KNUTS_IN_GALLEON + clampInt(s) * KNUTS_IN_SICKLE + clampInt(k); }
     function fromKnuts(total) {
-      const sign = total < 0 ? -1 : 1;
-      let rest = Math.abs(total);
-      const g = Math.floor(rest / KNUTS_IN_GALLEON);
-      rest -= g * KNUTS_IN_GALLEON;
-      const s = Math.floor(rest / KNUTS_IN_SICKLE);
-      rest -= s * KNUTS_IN_SICKLE;
-      const k = rest;
-      return { g: g * sign, s: s * sign, k: k * sign };
+      const sign = total < 0 ? -1 : 1; let rest = Math.abs(total);
+      const g = Math.floor(rest / KNUTS_IN_GALLEON); rest -= g * KNUTS_IN_GALLEON;
+      const s = Math.floor(rest / KNUTS_IN_SICKLE); rest -= s * KNUTS_IN_SICKLE;
+      return { g: g * sign, s: s * sign, k: rest };
     }
     function formatTriplet(total) {
-      const sign = total < 0 ? "−" : "";
-      const p = fromKnuts(total);
-      return `${sign}${Math.abs(p.g)} г ${Math.abs(p.s)} с ${Math.abs(p.k)} к`;
+      const sign = total < 0 ? "−" : ""; const p = fromKnuts(total), tr = t();
+      return `${sign}${Math.abs(p.g)} ${tr.unitG} ${Math.abs(p.s)} ${tr.unitS} ${Math.abs(p.k)} ${tr.unitK}`;
     }
     function dec(total, divisor) { return (total / divisor).toFixed(2); }
-
     function save() {
       localStorage.setItem(STORAGE_KEY, String(balanceKnuts));
       localStorage.setItem(HISTORY_KEY, JSON.stringify(history.slice(0, 12)));
+      localStorage.setItem(LANGUAGE_KEY, language);
     }
-    function enteredKnuts() {
-      return toKnuts(els.inputG.value, els.inputS.value, els.inputK.value);
-    }
-    function resetInputs() {
-      els.inputG.value = "0";
-      els.inputS.value = "0";
-      els.inputK.value = "0";
-      renderEntered();
-    }
+    function enteredKnuts() { return toKnuts(el.inputG.value, el.inputS.value, el.inputK.value); }
+    function resetInputs() { el.inputG.value = "0"; el.inputS.value = "0"; el.inputK.value = "0"; renderEntered(); }
     function pushHistory(type, amount, result) {
-      history.unshift({
-        id: Date.now() + "-" + Math.random().toString(36).slice(2, 8),
-        type, amount, result,
-        time: new Date().toLocaleString()
-      });
-      history = history.slice(0, 12);
-      save();
+      history.unshift({ id: Date.now() + "-" + Math.random().toString(36).slice(2,8), type, amount, result, time: new Date().toLocaleString(language === "ru" ? "ru-RU" : "en-US") });
+      history = history.slice(0, 12); save();
+    }
+    function renderTexts() {
+      const tr = t(); document.documentElement.lang = tr.htmlLang; document.title = tr.title;
+      el.wizardingBank.textContent = tr.wizardingBank; el.pageTitle.textContent = tr.title; el.pageSubtitle.textContent = tr.subtitle;
+      el.installHint.textContent = tr.installHint; el.balanceTitle.textContent = tr.balanceTitle; el.balanceInGalleonsLabel.textContent = tr.balanceInGalleons;
+      el.balanceInSicklesLabel.textContent = tr.balanceInSickles; el.balanceInKnutsLabel.textContent = tr.balanceInKnuts; el.galleonRate.textContent = tr.galleonRate;
+      el.sickleRate.textContent = tr.sickleRate; el.baseUnit.textContent = tr.baseUnit; el.normalizedBalanceLabel.textContent = tr.normalizedBalance;
+      el.galleonsLabel.textContent = tr.galleons; el.sicklesLabel.textContent = tr.sickles; el.knutsLabel.textContent = tr.knuts; el.operationTitle.textContent = tr.operation;
+      el.languageLabel.textContent = tr.language; el.tabAdd.textContent = tr.add; el.tabSubtract.textContent = tr.subtract; el.tabSet.textContent = tr.set;
+      el.inputGLabel.textContent = tr.galleons; el.inputSLabel.textContent = tr.sickles; el.inputKLabel.textContent = tr.knuts; el.enteredAmountLabel.textContent = tr.enteredAmount;
+      el.resetBtn.textContent = tr.resetInput; el.clearBtn.textContent = tr.clearAll; el.historyTitle.textContent = tr.historyTitle; el.footerNote.textContent = tr.footerNote;
+      el.onlineStatus.textContent = navigator.onLine ? tr.online : tr.offline; setMode(mode, false);
     }
     function renderHistory() {
-      if (!history.length) {
-        els.history.innerHTML = '<div class="preview small">История пока пустая.</div>';
-        return;
-      }
-      els.history.innerHTML = history.map(item => `
-        <div class="history-item">
-          <div class="row-between">
-            <strong>${item.type === "add" ? "Пополнение" : item.type === "subtract" ? "Списание" : "Установка баланса"}</strong>
-            <span class="small">${item.time}</span>
-          </div>
-          <div class="small" style="margin-top: 8px;">Сумма: ${formatTriplet(item.amount)}</div>
-          <div class="small">Новый баланс: ${formatTriplet(item.result)}</div>
-        </div>
-      `).join("");
+      const tr = t();
+      if (!history.length) { el.history.innerHTML = `<div class="preview small">${tr.historyEmpty}</div>`; return; }
+      el.history.innerHTML = history.map(item => `<div class="history-item"><div class="row-between"><strong>${item.type === "add" ? tr.addOp : item.type === "subtract" ? tr.subtractOp : tr.setOp}</strong><span class="small">${item.time}</span></div><div class="small" style="margin-top: 8px;">${tr.amount}: ${formatTriplet(item.amount)}</div><div class="small">${tr.newBalance}: ${formatTriplet(item.result)}</div></div>`).join("");
     }
     function renderEntered() {
-      const value = enteredKnuts();
-      els.enteredTriplet.textContent = formatTriplet(value);
-      els.enteredAsG.textContent = dec(value, KNUTS_IN_GALLEON) + " гал.";
-      els.enteredAsS.textContent = dec(value, KNUTS_IN_SICKLE) + " сик.";
-      els.enteredAsK.textContent = value + " кн.";
+      const value = enteredKnuts(), tr = t();
+      el.enteredTriplet.textContent = formatTriplet(value);
+      el.enteredAsG.textContent = dec(value, KNUTS_IN_GALLEON) + " " + tr.decimalGalleons;
+      el.enteredAsS.textContent = dec(value, KNUTS_IN_SICKLE) + " " + tr.decimalSickles;
+      el.enteredAsK.textContent = value + " " + tr.decimalKnuts;
     }
     function renderBalance() {
       const n = fromKnuts(balanceKnuts);
-      els.balanceGalleons.textContent = dec(balanceKnuts, KNUTS_IN_GALLEON);
-      els.balanceSickles.textContent = dec(balanceKnuts, KNUTS_IN_SICKLE);
-      els.balanceKnuts.textContent = String(balanceKnuts);
-      els.normalizedBalance.textContent = formatTriplet(balanceKnuts);
-      els.normG.textContent = String(n.g);
-      els.normS.textContent = String(n.s);
-      els.normK.textContent = String(n.k);
+      el.balanceGalleons.textContent = dec(balanceKnuts, KNUTS_IN_GALLEON);
+      el.balanceSickles.textContent = dec(balanceKnuts, KNUTS_IN_SICKLE);
+      el.balanceKnuts.textContent = String(balanceKnuts);
+      el.normalizedBalance.textContent = formatTriplet(balanceKnuts);
+      el.normG.textContent = String(n.g); el.normS.textContent = String(n.s); el.normK.textContent = String(n.k);
     }
-    function renderAll() {
-      renderBalance();
-      renderEntered();
-      renderHistory();
-    }
-    function setMode(next) {
-      mode = next;
-      document.querySelectorAll(".tab").forEach(btn => {
-        btn.classList.toggle("active", btn.dataset.mode === next);
-      });
-      els.applyBtn.textContent =
-        next === "add" ? "Добавить к балансу" :
-        next === "subtract" ? "Списать с баланса" :
-        "Установить баланс";
+    function renderAll() { renderTexts(); renderBalance(); renderEntered(); renderHistory(); save(); }
+    function setMode(next, rerender = true) {
+      mode = next; document.querySelectorAll(".tab").forEach(btn => btn.classList.toggle("active", btn.dataset.mode === next));
+      const tr = t(); el.applyBtn.textContent = next === "add" ? tr.addToBalance : next === "subtract" ? tr.subtractFromBalance : tr.setBalance;
+      if (rerender) renderEntered();
     }
 
-    document.querySelectorAll(".tab").forEach(btn => {
-      btn.addEventListener("click", () => setMode(btn.dataset.mode));
-    });
-    ["inputG", "inputS", "inputK"].forEach(id => {
-      document.getElementById(id).addEventListener("input", renderEntered);
-    });
-    document.getElementById("resetBtn").addEventListener("click", resetInputs);
-    document.getElementById("clearBtn").addEventListener("click", () => {
-      balanceKnuts = 0;
-      history = [];
-      localStorage.removeItem(STORAGE_KEY);
-      localStorage.removeItem(HISTORY_KEY);
-      resetInputs();
-      renderAll();
-    });
-    document.getElementById("applyBtn").addEventListener("click", () => {
+    document.querySelectorAll(".tab").forEach(btn => btn.addEventListener("click", () => setMode(btn.dataset.mode)));
+    ["inputG","inputS","inputK"].forEach(id => document.getElementById(id).addEventListener("input", renderEntered));
+    el.languageSelect.value = language;
+    el.languageSelect.addEventListener("change", e => { language = e.target.value; save(); renderAll(); });
+    el.resetBtn.addEventListener("click", resetInputs);
+    el.clearBtn.addEventListener("click", () => { balanceKnuts = 0; history = []; localStorage.removeItem(STORAGE_KEY); localStorage.removeItem(HISTORY_KEY); resetInputs(); renderAll(); });
+    el.applyBtn.addEventListener("click", () => {
       const value = enteredKnuts();
       if (mode === "add") balanceKnuts += value;
       if (mode === "subtract") balanceKnuts = Math.max(0, balanceKnuts - value);
       if (mode === "set") balanceKnuts = Math.max(0, value);
-      pushHistory(mode, value, balanceKnuts);
-      save();
-      resetInputs();
-      renderAll();
+      pushHistory(mode, value, balanceKnuts); resetInputs(); renderAll();
     });
-
-    window.addEventListener("online", () => {
-      els.onlineStatus.textContent = "Онлайн";
-      els.onlineStatus.classList.remove("offline");
-    });
-    window.addEventListener("offline", () => {
-      els.onlineStatus.textContent = "Офлайн";
-      els.onlineStatus.classList.add("offline");
-    });
+    window.addEventListener("online", renderTexts); window.addEventListener("offline", renderTexts);
 
     let deferredPrompt = null;
-    window.addEventListener("beforeinstallprompt", (e) => {
-      e.preventDefault();
-      deferredPrompt = e;
-      els.installHint.textContent = "📲 Нажми сюда, чтобы установить";
-      els.installHint.style.cursor = "pointer";
-      els.installHint.onclick = async () => {
-        if (!deferredPrompt) return;
-        deferredPrompt.prompt();
-        await deferredPrompt.userChoice;
-        deferredPrompt = null;
-      };
+    window.addEventListener("beforeinstallprompt", e => {
+      e.preventDefault(); deferredPrompt = e; el.installHint.style.cursor = "pointer";
+      el.installHint.onclick = async () => { if (!deferredPrompt) return; deferredPrompt.prompt(); await deferredPrompt.userChoice; deferredPrompt = null; };
     });
 
-    if ("serviceWorker" in navigator) {
-      navigator.serviceWorker.register("./service-worker.js");
-    }
-
-    setMode("add");
-    renderAll();
-    if (!navigator.onLine) {
-      els.onlineStatus.textContent = "Офлайн";
-      els.onlineStatus.classList.add("offline");
-    }
+    if ("serviceWorker" in navigator) navigator.serviceWorker.register("./service-worker.js");
+    setMode("add", false); renderAll();
   </script>
 </body>
 </html>
