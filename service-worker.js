@@ -1,4 +1,4 @@
-const CACHE = "hp-currency-pwa-v4";
+const CACHE = "hp-currency-pwa-v5";
 const ASSETS = ["./","./index.html","./manifest.json","./service-worker.js","./icon-192.png","./icon-512.png"];
 self.addEventListener("install", (event) => {
   event.waitUntil(caches.open(CACHE).then((cache) => cache.addAll(ASSETS)));
