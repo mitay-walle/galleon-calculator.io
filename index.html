@@ -1,382 +1,439 @@
-<!doctype html>
-<html lang="ru">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <meta name="theme-color" content="#7c3aed" />
-  <meta name="description" content="PWA-калькулятор валют Гарри Поттера" />
-  <title>HP Currency Calculator</title>
-  <link rel="manifest" href="manifest.json" />
-  <style>
-    :root {
-      --bg: #0b1020;
-      --card: rgba(20, 26, 48, 0.86);
-      --card-2: rgba(30, 38, 67, 0.72);
-      --text: #f8f7ff;
-      --muted: #b9b7d9;
-      --accent: #a78bfa;
-      --accent-2: #f59e0b;
-      --danger: #ef4444;
-      --ok: #22c55e;
-      --border: rgba(255,255,255,0.09);
-      --shadow: 0 10px 30px rgba(0,0,0,.28);
-      --radius: 22px;
-    }
-    * { box-sizing: border-box; }
-    html, body { margin: 0; min-height: 100%; font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, sans-serif; background:
-      radial-gradient(circle at top, #2a1f53 0%, #11182e 38%, #090d18 100%);
-      color: var(--text); }
-    body { padding: 18px; }
-    .wrap { max-width: 1080px; margin: 0 auto; display: grid; gap: 18px; }
-    .hero, .card { border: 1px solid var(--border); background: var(--card); border-radius: 28px; box-shadow: var(--shadow); backdrop-filter: blur(10px); }
-    .hero { overflow: hidden; }
-    .hero-top {
-      padding: 22px;
-      background: linear-gradient(135deg, rgba(167,139,250,.22), rgba(245,158,11,.18));
-      border-bottom: 1px solid var(--border);
-    }
-    .hero-top h1 { margin: 10px 0 8px; font-size: clamp(28px, 5vw, 42px); line-height: 1.06; }
-    .hero-top p { margin: 0; color: var(--muted); }
-    .badge {
-      display: inline-flex; align-items: center; gap: 8px;
-      padding: 8px 12px; border-radius: 999px; font-size: 13px;
-      background: rgba(255,255,255,.08); border: 1px solid var(--border);
-    }
-    .grid { display: grid; gap: 18px; }
-    .main { grid-template-columns: 1.1fr .9fr; }
-    .stats { grid-template-columns: repeat(3, 1fr); }
-    .triplet { grid-template-columns: repeat(3, 1fr); }
-    .card { padding: 18px; }
-    .stat-value { font-size: 30px; font-weight: 700; margin-top: 6px; }
-    .label, .hint, .small { color: var(--muted); }
-    .small { font-size: 13px; }
-    .balance-big { font-size: clamp(28px, 5vw, 40px); font-weight: 800; margin-top: 6px; }
-    .row { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
-    .row-between { display:flex; justify-content: space-between; align-items:center; gap: 12px; flex-wrap: wrap; }
-    .tabs { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; }
-    .tab, button {
-      border: 1px solid var(--border);
-      background: var(--card-2);
-      color: var(--text);
-      border-radius: 18px;
-      min-height: 48px;
-      padding: 12px 16px;
-      font: inherit;
-    }
-    .tab.active { background: linear-gradient(135deg, rgba(167,139,250,.24), rgba(245,158,11,.16)); border-color: rgba(167,139,250,.5); }
-    input {
-      width: 100%; min-height: 48px;
-      border-radius: 18px; border: 1px solid var(--border);
-      background: rgba(255,255,255,.05); color: var(--text);
-      padding: 12px 14px; font: inherit;
-    }
-    .inputs { display: grid; gap: 12px; grid-template-columns: repeat(3, 1fr); }
-    .section-title { font-size: 22px; font-weight: 700; margin: 0 0 14px; }
-    .action-primary { background: linear-gradient(135deg, rgba(167,139,250,.32), rgba(245,158,11,.22)); }
-    .action-danger { background: rgba(239,68,68,.14); }
-    .preview, .history-item, .mini-card {
-      border: 1px solid var(--border);
-      background: rgba(255,255,255,.04);
-      border-radius: 20px;
-      padding: 14px;
-    }
-    .history { display: grid; gap: 10px; }
-    .status { font-size: 13px; color: var(--ok); }
-    .status.offline { color: var(--accent-2); }
-    .footer-note { text-align: center; color: var(--muted); font-size: 13px; padding-bottom: 10px; }
-    @media (max-width: 860px) {
-      .main, .stats, .triplet, .inputs { grid-template-columns: 1fr; }
-      body { padding: 12px; }
-    }
-  </style>
-</head>
-<body>
-  <div class="wrap">
-    <section class="hero">
-      <div class="hero-top">
-        <div class="row-between">
-          <div>
-            <div class="badge">⚡ Wizarding Bank</div>
-            <h1>Калькулятор валют Гарри Поттера</h1>
-            <p>Галлеоны, сикли и кнаты. Простые операции, история и сохранение баланса.</p>
-          </div>
-          <div class="badge" id="installHint">📲 Можно установить на главный экран</div>
-        </div>
-      </div>
-      <div class="card" style="margin: 18px;">
-        <div class="grid stats">
-          <div class="mini-card">
-            <div class="label">Баланс в галлеонах</div>
-            <div class="stat-value" id="balanceGalleons">0.00</div>
-            <div class="small">1 галлеон = 17 сиклей = 493 кната</div>
-          </div>
-          <div class="mini-card">
-            <div class="label">Баланс в сиклях</div>
-            <div class="stat-value" id="balanceSickles">0.00</div>
-            <div class="small">1 сикль = 29 кнатов</div>
-          </div>
-          <div class="mini-card">
-            <div class="label">Баланс в кнатах</div>
-            <div class="stat-value" id="balanceKnuts">0</div>
-            <div class="small">Базовая единица хранения</div>
-          </div>
-        </div>
-      </div>
-    </section>
+import React, { useEffect, useMemo, useState } from "react";
+import { motion } from "framer-motion";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Calculator, Coins, RotateCcw, Save, Trash2, Wand2 } from "lucide-react";
 
-    <section class="grid main">
-      <div class="card">
-        <div class="row-between">
-          <h2 class="section-title">Баланс</h2>
-          <div class="status" id="onlineStatus">Онлайн</div>
-        </div>
-        <div class="preview">
-          <div class="label">Нормализованный баланс</div>
-          <div class="balance-big" id="normalizedBalance">0 г 0 с 0 к</div>
-          <div class="grid triplet" style="margin-top: 14px;">
-            <div class="mini-card"><div class="label">Галлеоны</div><div class="stat-value" id="normG">0</div></div>
-            <div class="mini-card"><div class="label">Сикли</div><div class="stat-value" id="normS">0</div></div>
-            <div class="mini-card"><div class="label">Кнаты</div><div class="stat-value" id="normK">0</div></div>
-          </div>
-        </div>
-      </div>
+const KNUTS_IN_SICKLE = 29;
+const SICKLES_IN_GALLEON = 17;
+const KNUTS_IN_GALLEON = KNUTS_IN_SICKLE * SICKLES_IN_GALLEON;
+const STORAGE_KEY = "hp-currency-balance-v1";
+const HISTORY_KEY = "hp-currency-history-v1";
+const LANGUAGE_KEY = "hp-currency-language-v1";
 
-      <div class="card">
-        <h2 class="section-title">Операция</h2>
-        <div class="tabs">
-          <button class="tab active" data-mode="add">Пополнить</button>
-          <button class="tab" data-mode="subtract">Списать</button>
-          <button class="tab" data-mode="set">Установить</button>
-        </div>
+const translations = {
+  ru: {
+    wizardingBank: "Wizarding Bank",
+    title: "Калькулятор валют Гарри Поттера",
+    subtitle: "Простые операции с балансом, автоматическая конвертация и сохранение прямо в браузере.",
+    resetInput: "Сброс ввода",
+    clearAll: "Очистить всё",
+    balanceInGalleons: "Баланс в галлеонах",
+    balanceInSickles: "Баланс в сиклях",
+    balanceInKnuts: "Баланс в кнатах",
+    galleonRate: "1 галлеон = 17 сиклей = 493 кната",
+    sickleRate: "1 сикль = 29 кнатов",
+    baseUnit: "Базовая единица хранения",
+    normalizedBalance: "Нормализованный баланс",
+    autoSaved: "сохраняется автоматически",
+    galleons: "Галлеоны",
+    sickles: "Сикли",
+    knuts: "Кнаты",
+    operation: "Операция",
+    add: "Пополнить",
+    subtract: "Списать",
+    set: "Установить",
+    enteredAmount: "Введённая сумма",
+    addToBalance: "Добавить к балансу",
+    subtractFromBalance: "Списать с баланса",
+    setBalance: "Установить баланс",
+    insufficientFunds: "Недостаточно средств для списания.",
+    recentOperations: "Последние операции",
+    historyEmpty: "История пока пустая.",
+    addOp: "Пополнение",
+    subtractOp: "Списание",
+    setOp: "Установка баланса",
+    amount: "Сумма",
+    newBalance: "Новый баланс",
+    decimalGalleons: "гал.",
+    decimalSickles: "сик.",
+    decimalKnuts: "кн.",
+    language: "Язык"
+  },
+  en: {
+    wizardingBank: "Wizarding Bank",
+    title: "Harry Potter Currency Calculator",
+    subtitle: "Simple balance operations, automatic conversion, and browser storage.",
+    resetInput: "Reset input",
+    clearAll: "Clear all",
+    balanceInGalleons: "Balance in Galleons",
+    balanceInSickles: "Balance in Sickles",
+    balanceInKnuts: "Balance in Knuts",
+    galleonRate: "1 Galleon = 17 Sickles = 493 Knuts",
+    sickleRate: "1 Sickle = 29 Knuts",
+    baseUnit: "Base storage unit",
+    normalizedBalance: "Normalized balance",
+    autoSaved: "saved automatically",
+    galleons: "Galleons",
+    sickles: "Sickles",
+    knuts: "Knuts",
+    operation: "Operation",
+    add: "Add",
+    subtract: "Subtract",
+    set: "Set",
+    enteredAmount: "Entered amount",
+    addToBalance: "Add to balance",
+    subtractFromBalance: "Subtract from balance",
+    setBalance: "Set balance",
+    insufficientFunds: "Insufficient funds for subtraction.",
+    recentOperations: "Recent operations",
+    historyEmpty: "History is empty.",
+    addOp: "Deposit",
+    subtractOp: "Withdrawal",
+    setOp: "Set balance",
+    amount: "Amount",
+    newBalance: "New balance",
+    decimalGalleons: "gal.",
+    decimalSickles: "sic.",
+    decimalKnuts: "kn.",
+    language: "Language"
+  }
+};
 
-        <div class="inputs" style="margin-top: 14px;">
-          <div>
-            <div class="small" style="margin-bottom: 6px;">Галлеоны</div>
-            <input id="inputG" inputmode="numeric" value="0" />
-          </div>
-          <div>
-            <div class="small" style="margin-bottom: 6px;">Сикли</div>
-            <input id="inputS" inputmode="numeric" value="0" />
-          </div>
-          <div>
-            <div class="small" style="margin-bottom: 6px;">Кнаты</div>
-            <input id="inputK" inputmode="numeric" value="0" />
-          </div>
-        </div>
+function clampInt(value) {
+  const n = Number.parseInt(String(value).replace(/[^\d-]/g, ""), 10);
+  return Number.isFinite(n) ? n : 0;
+}
 
-        <div class="preview" style="margin-top: 14px;">
-          <div class="label">Введённая сумма</div>
-          <div class="stat-value" id="enteredTriplet">0 г 0 с 0 к</div>
-          <div class="row small" style="margin-top: 6px;">
-            <div id="enteredAsG">0.00 гал.</div>
-            <div id="enteredAsS">0.00 сик.</div>
-            <div id="enteredAsK">0 кн.</div>
-          </div>
-        </div>
+function toKnuts({ galleons, sickles, knuts }) {
+  return clampInt(galleons) * KNUTS_IN_GALLEON + clampInt(sickles) * KNUTS_IN_SICKLE + clampInt(knuts);
+}
 
-        <div class="row" style="margin-top: 14px;">
-          <button id="applyBtn" class="action-primary" style="flex: 1;">Применить</button>
-          <button id="resetBtn">Сброс ввода</button>
-          <button id="clearBtn" class="action-danger">Очистить всё</button>
-        </div>
-      </div>
-    </section>
+function fromKnuts(totalKnuts) {
+  const sign = totalKnuts < 0 ? -1 : 1;
+  let rest = Math.abs(totalKnuts);
+  const galleons = Math.floor(rest / KNUTS_IN_GALLEON);
+  rest -= galleons * KNUTS_IN_GALLEON;
+  const sickles = Math.floor(rest / KNUTS_IN_SICKLE);
+  rest -= sickles * KNUTS_IN_SICKLE;
+  const knuts = rest;
+  return {
+    galleons: galleons * sign,
+    sickles: sickles * sign,
+    knuts: knuts * sign,
+  };
+}
 
-    <section class="card">
-      <h2 class="section-title">Последние операции</h2>
-      <div id="history" class="history"></div>
-    </section>
+function formatTriplet(totalKnuts) {
+  const sign = totalKnuts < 0 ? "−" : "";
+  const parts = fromKnuts(totalKnuts);
+  return `${sign}${Math.abs(parts.galleons)} г ${Math.abs(parts.sickles)} с ${Math.abs(parts.knuts)} к`;
+}
 
-    <div class="footer-note">Данные сохраняются локально на устройстве.</div>
-  </div>
+function formatDecimal(totalKnuts, divisor, digits = 2) {
+  return (totalKnuts / divisor).toFixed(digits);
+}
 
-  <script>
-    const KNUTS_IN_SICKLE = 29;
-    const SICKLES_IN_GALLEON = 17;
-    const KNUTS_IN_GALLEON = KNUTS_IN_SICKLE * SICKLES_IN_GALLEON;
-    const STORAGE_KEY = "hp-currency-balance-v1";
-    const HISTORY_KEY = "hp-currency-history-v1";
+function StatCard({ title, value, caption }) {
+  return (
+    <Card className="rounded-2xl shadow-sm">
+      <CardContent className="p-4">
+        <div className="text-sm text-muted-foreground">{title}</div>
+        <div className="mt-2 text-2xl font-semibold tracking-tight">{value}</div>
+        <div className="mt-1 text-xs text-muted-foreground">{caption}</div>
+      </CardContent>
+    </Card>
+  );
+}
 
-    let mode = "add";
-    let balanceKnuts = parseInt(localStorage.getItem(STORAGE_KEY) || "0", 10) || 0;
-    let history = [];
-    try { history = JSON.parse(localStorage.getItem(HISTORY_KEY) || "[]"); } catch { history = []; }
+export default function HarryPotterCurrencyCalculator() {
+  const [balanceKnuts, setBalanceKnuts] = useState(0);
+  const [language, setLanguage] = useState("ru");
+  const [mode, setMode] = useState("add");
+  const [galleons, setGalleons] = useState("0");
+  const [sickles, setSickles] = useState("0");
+  const [knuts, setKnuts] = useState("0");
+  const [history, setHistory] = useState([]);
 
-    const els = {
-      balanceGalleons: document.getElementById("balanceGalleons"),
-      balanceSickles: document.getElementById("balanceSickles"),
-      balanceKnuts: document.getElementById("balanceKnuts"),
-      normalizedBalance: document.getElementById("normalizedBalance"),
-      normG: document.getElementById("normG"),
-      normS: document.getElementById("normS"),
-      normK: document.getElementById("normK"),
-      inputG: document.getElementById("inputG"),
-      inputS: document.getElementById("inputS"),
-      inputK: document.getElementById("inputK"),
-      enteredTriplet: document.getElementById("enteredTriplet"),
-      enteredAsG: document.getElementById("enteredAsG"),
-      enteredAsS: document.getElementById("enteredAsS"),
-      enteredAsK: document.getElementById("enteredAsK"),
-      history: document.getElementById("history"),
-      onlineStatus: document.getElementById("onlineStatus"),
-      installHint: document.getElementById("installHint"),
-      applyBtn: document.getElementById("applyBtn")
-    };
+  useEffect(() => {
+    const savedBalance = window.localStorage.getItem(STORAGE_KEY);
+    const savedHistory = window.localStorage.getItem(HISTORY_KEY);
+    const savedLanguage = window.localStorage.getItem(LANGUAGE_KEY);
 
-    function clampInt(value) {
-      const n = parseInt(String(value).replace(/[^\d-]/g, ""), 10);
-      return Number.isFinite(n) ? n : 0;
+    if (savedBalance !== null) {
+      const parsed = Number(savedBalance);
+      if (Number.isFinite(parsed)) setBalanceKnuts(parsed);
     }
-    function toKnuts(g, s, k) {
-      return clampInt(g) * KNUTS_IN_GALLEON + clampInt(s) * KNUTS_IN_SICKLE + clampInt(k);
-    }
-    function fromKnuts(total) {
-      const sign = total < 0 ? -1 : 1;
-      let rest = Math.abs(total);
-      const g = Math.floor(rest / KNUTS_IN_GALLEON);
-      rest -= g * KNUTS_IN_GALLEON;
-      const s = Math.floor(rest / KNUTS_IN_SICKLE);
-      rest -= s * KNUTS_IN_SICKLE;
-      const k = rest;
-      return { g: g * sign, s: s * sign, k: k * sign };
-    }
-    function formatTriplet(total) {
-      const sign = total < 0 ? "−" : "";
-      const p = fromKnuts(total);
-      return `${sign}${Math.abs(p.g)} г ${Math.abs(p.s)} с ${Math.abs(p.k)} к`;
-    }
-    function dec(total, divisor) { return (total / divisor).toFixed(2); }
 
-    function save() {
-      localStorage.setItem(STORAGE_KEY, String(balanceKnuts));
-      localStorage.setItem(HISTORY_KEY, JSON.stringify(history.slice(0, 12)));
+    if (savedLanguage && translations[savedLanguage]) {
+      setLanguage(savedLanguage);
     }
-    function enteredKnuts() {
-      return toKnuts(els.inputG.value, els.inputS.value, els.inputK.value);
-    }
-    function resetInputs() {
-      els.inputG.value = "0";
-      els.inputS.value = "0";
-      els.inputK.value = "0";
-      renderEntered();
-    }
-    function pushHistory(type, amount, result) {
-      history.unshift({
-        id: Date.now() + "-" + Math.random().toString(36).slice(2, 8),
-        type, amount, result,
-        time: new Date().toLocaleString()
-      });
-      history = history.slice(0, 12);
-      save();
-    }
-    function renderHistory() {
-      if (!history.length) {
-        els.history.innerHTML = '<div class="preview small">История пока пустая.</div>';
-        return;
+
+    if (savedHistory) {
+      try {
+        const parsed = JSON.parse(savedHistory);
+        if (Array.isArray(parsed)) setHistory(parsed);
+      } catch {
+        // ignore broken storage
       }
-      els.history.innerHTML = history.map(item => `
-        <div class="history-item">
-          <div class="row-between">
-            <strong>${item.type === "add" ? "Пополнение" : item.type === "subtract" ? "Списание" : "Установка баланса"}</strong>
-            <span class="small">${item.time}</span>
-          </div>
-          <div class="small" style="margin-top: 8px;">Сумма: ${formatTriplet(item.amount)}</div>
-          <div class="small">Новый баланс: ${formatTriplet(item.result)}</div>
-        </div>
-      `).join("");
     }
-    function renderEntered() {
-      const value = enteredKnuts();
-      els.enteredTriplet.textContent = formatTriplet(value);
-      els.enteredAsG.textContent = dec(value, KNUTS_IN_GALLEON) + " гал.";
-      els.enteredAsS.textContent = dec(value, KNUTS_IN_SICKLE) + " сик.";
-      els.enteredAsK.textContent = value + " кн.";
-    }
-    function renderBalance() {
-      const n = fromKnuts(balanceKnuts);
-      els.balanceGalleons.textContent = dec(balanceKnuts, KNUTS_IN_GALLEON);
-      els.balanceSickles.textContent = dec(balanceKnuts, KNUTS_IN_SICKLE);
-      els.balanceKnuts.textContent = String(balanceKnuts);
-      els.normalizedBalance.textContent = formatTriplet(balanceKnuts);
-      els.normG.textContent = String(n.g);
-      els.normS.textContent = String(n.s);
-      els.normK.textContent = String(n.k);
-    }
-    function renderAll() {
-      renderBalance();
-      renderEntered();
-      renderHistory();
-    }
-    function setMode(next) {
-      mode = next;
-      document.querySelectorAll(".tab").forEach(btn => {
-        btn.classList.toggle("active", btn.dataset.mode === next);
-      });
-      els.applyBtn.textContent =
-        next === "add" ? "Добавить к балансу" :
-        next === "subtract" ? "Списать с баланса" :
-        "Установить баланс";
-    }
+  }, []);
 
-    document.querySelectorAll(".tab").forEach(btn => {
-      btn.addEventListener("click", () => setMode(btn.dataset.mode));
-    });
-    ["inputG", "inputS", "inputK"].forEach(id => {
-      document.getElementById(id).addEventListener("input", renderEntered);
-    });
-    document.getElementById("resetBtn").addEventListener("click", resetInputs);
-    document.getElementById("clearBtn").addEventListener("click", () => {
-      balanceKnuts = 0;
-      history = [];
-      localStorage.removeItem(STORAGE_KEY);
-      localStorage.removeItem(HISTORY_KEY);
-      resetInputs();
-      renderAll();
-    });
-    document.getElementById("applyBtn").addEventListener("click", () => {
-      const value = enteredKnuts();
-      if (mode === "add") balanceKnuts += value;
-      if (mode === "subtract") balanceKnuts = Math.max(0, balanceKnuts - value);
-      if (mode === "set") balanceKnuts = Math.max(0, value);
-      pushHistory(mode, value, balanceKnuts);
-      save();
-      resetInputs();
-      renderAll();
-    });
+  useEffect(() => {
+    window.localStorage.setItem(STORAGE_KEY, String(balanceKnuts));
+  }, [balanceKnuts]);
 
-    window.addEventListener("online", () => {
-      els.onlineStatus.textContent = "Онлайн";
-      els.onlineStatus.classList.remove("offline");
-    });
-    window.addEventListener("offline", () => {
-      els.onlineStatus.textContent = "Офлайн";
-      els.onlineStatus.classList.add("offline");
-    });
+  useEffect(() => {
+    window.localStorage.setItem(HISTORY_KEY, JSON.stringify(history.slice(0, 8)));
+  }, [history]);
 
-    let deferredPrompt = null;
-    window.addEventListener("beforeinstallprompt", (e) => {
-      e.preventDefault();
-      deferredPrompt = e;
-      els.installHint.textContent = "📲 Нажми сюда, чтобы установить";
-      els.installHint.style.cursor = "pointer";
-      els.installHint.onclick = async () => {
-        if (!deferredPrompt) return;
-        deferredPrompt.prompt();
-        await deferredPrompt.userChoice;
-        deferredPrompt = null;
-      };
-    });
+  useEffect(() => {
+    window.localStorage.setItem(LANGUAGE_KEY, language);
+  }, [language]);
 
-    if ("serviceWorker" in navigator) {
-      navigator.serviceWorker.register("./service-worker.js");
-    }
+  const t = translations[language];
 
-    setMode("add");
-    renderAll();
-    if (!navigator.onLine) {
-      els.onlineStatus.textContent = "Офлайн";
-      els.onlineStatus.classList.add("offline");
-    }
-  </script>
-</body>
-</html>
+  const enteredKnuts = useMemo(
+    () => toKnuts({ galleons, sickles, knuts }),
+    [galleons, sickles, knuts]
+  );
+
+  const normalized = useMemo(() => fromKnuts(balanceKnuts), [balanceKnuts]);
+
+  const canApply = mode === "set" || balanceKnuts - enteredKnuts >= 0 || mode === "add";
+
+  function resetInputs() {
+    setGalleons("0");
+    setSickles("0");
+    setKnuts("0");
+  }
+
+  function pushHistory(type, amount, result) {
+    const next = {
+      id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+      type,
+      amount,
+      result,
+      time: new Date().toLocaleString(),
+    };
+    setHistory((prev) => [next, ...prev].slice(0, 8));
+  }
+
+  function applyOperation() {
+    let next = balanceKnuts;
+    if (mode === "add") next = balanceKnuts + enteredKnuts;
+    if (mode === "subtract") next = Math.max(0, balanceKnuts - enteredKnuts);
+    if (mode === "set") next = Math.max(0, enteredKnuts);
+
+    setBalanceKnuts(next);
+    pushHistory(mode, enteredKnuts, next);
+    resetInputs();
+  }
+
+  function clearAll() {
+    setBalanceKnuts(0);
+    setHistory([]);
+    resetInputs();
+    window.localStorage.removeItem(STORAGE_KEY);
+    window.localStorage.removeItem(HISTORY_KEY);
+  }
+
+  return (
+    <div className="min-h-screen bg-background p-4 md:p-8">
+      <div className="mx-auto grid max-w-6xl gap-6 lg:grid-cols-[1.15fr_0.85fr]">
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.35 }}
+          className="space-y-6"
+        >
+          <Card className="overflow-hidden rounded-3xl border shadow-sm">
+            <div className="bg-gradient-to-br from-amber-100 via-yellow-50 to-orange-100 p-6 dark:from-amber-950 dark:via-yellow-950 dark:to-orange-950">
+              <div className="flex flex-wrap items-start justify-between gap-4">
+                <div>
+                  <div className="mb-2 flex items-center gap-2">
+                    <Badge variant="secondary" className="rounded-full px-3 py-1">
+                      <Wand2 className="mr-1 h-3.5 w-3.5" />
+                      {t.wizardingBank}
+                    </Badge>
+                  </div>
+                  <h1 className="text-3xl font-semibold tracking-tight md:text-4xl">
+                    {t.title}
+                  </h1>
+                  <p className="mt-2 max-w-2xl text-sm text-muted-foreground md:text-base">
+                    {t.subtitle}
+                  </p>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  <div className="flex items-center gap-2 rounded-2xl border px-3 py-2 text-sm">
+                    <span className="text-muted-foreground">{t.language}:</span>
+                    <select
+                      value={language}
+                      onChange={(e) => setLanguage(e.target.value)}
+                      className="bg-transparent outline-none"
+                    >
+                      <option value="ru">Русский</option>
+                      <option value="en">English</option>
+                    </select>
+                  </div>
+                  <Button variant="outline" className="rounded-2xl" onClick={resetInputs}>
+                    <RotateCcw className="mr-2 h-4 w-4" />
+                    {t.resetInput}
+                  </Button>
+                  <Button variant="destructive" className="rounded-2xl" onClick={clearAll}>
+                    <Trash2 className="mr-2 h-4 w-4" />
+                    {t.clearAll}
+                  </Button>
+                </div>
+              </div>
+            </div>
+
+            <CardContent className="grid gap-6 p-6">
+              <div className="grid gap-4 md:grid-cols-3">
+                <StatCard
+                  title={t.balanceInGalleons}
+                  value={formatDecimal(balanceKnuts, KNUTS_IN_GALLEON, 2)}
+                  caption={t.galleonRate}
+                />
+                <StatCard
+                  title={t.balanceInSickles}
+                  value={formatDecimal(balanceKnuts, KNUTS_IN_SICKLE, 2)}
+                  caption={t.sickleRate}
+                />
+                <StatCard
+                  title={t.balanceInKnuts}
+                  value={String(balanceKnuts)}
+                  caption={t.baseUnit}
+                />
+              </div>
+
+              <Card className="rounded-2xl border-dashed shadow-none">
+                <CardContent className="p-5">
+                  <div className="flex flex-wrap items-center justify-between gap-3">
+                    <div>
+                      <div className="text-sm text-muted-foreground">{t.normalizedBalance}</div>
+                      <div className="mt-1 text-3xl font-semibold tracking-tight">
+                        {formatTriplet(balanceKnuts)}
+                      </div>
+                    </div>
+                    <Badge className="rounded-full px-3 py-1 text-sm" variant="secondary">
+                      <Save className="mr-1.5 h-3.5 w-3.5" />
+                      {t.autoSaved}
+                    </Badge>
+                  </div>
+                  <div className="mt-4 grid gap-3 sm:grid-cols-3">
+                    <div className="rounded-2xl border p-4">
+                      <div className="text-sm text-muted-foreground">{t.galleons}</div>
+                      <div className="mt-1 text-2xl font-semibold">{normalized.galleons}</div>
+                    </div>
+                    <div className="rounded-2xl border p-4">
+                      <div className="text-sm text-muted-foreground">{t.sickles}</div>
+                      <div className="mt-1 text-2xl font-semibold">{normalized.sickles}</div>
+                    </div>
+                    <div className="rounded-2xl border p-4">
+                      <div className="text-sm text-muted-foreground">{t.knuts}</div>
+                      <div className="mt-1 text-2xl font-semibold">{normalized.knuts}</div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </CardContent>
+          </Card>
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, delay: 0.05 }}
+          className="space-y-6"
+        >
+          <Card className="rounded-3xl shadow-sm">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-xl">
+                <Calculator className="h-5 w-5" />
+                {t.operation}
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-5">
+              <Tabs value={mode} onValueChange={setMode}>
+                <TabsList className="grid w-full grid-cols-3 rounded-2xl">
+                  <TabsTrigger value="add" className="rounded-2xl">{t.add}</TabsTrigger>
+                  <TabsTrigger value="subtract" className="rounded-2xl">{t.subtract}</TabsTrigger>
+                  <TabsTrigger value="set" className="rounded-2xl">{t.set}</TabsTrigger>
+                </TabsList>
+              </Tabs>
+
+              <div className="grid gap-3 sm:grid-cols-3">
+                <div className="space-y-2">
+                  <label className="text-sm text-muted-foreground">{t.galleons}</label>
+                  <Input value={galleons} onChange={(e) => setGalleons(e.target.value)} inputMode="numeric" className="rounded-2xl" />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm text-muted-foreground">{t.sickles}</label>
+                  <Input value={sickles} onChange={(e) => setSickles(e.target.value)} inputMode="numeric" className="rounded-2xl" />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm text-muted-foreground">{t.knuts}</label>
+                  <Input value={knuts} onChange={(e) => setKnuts(e.target.value)} inputMode="numeric" className="rounded-2xl" />
+                </div>
+              </div>
+
+              <div className="rounded-2xl border bg-muted/30 p-4">
+                <div className="text-sm text-muted-foreground">{t.enteredAmount}</div>
+                <div className="mt-1 text-xl font-semibold">{formatTriplet(enteredKnuts)}</div>
+                <div className="mt-2 grid grid-cols-3 gap-2 text-sm text-muted-foreground">
+                  <div>{formatDecimal(enteredKnuts, KNUTS_IN_GALLEON, 2)} {t.decimalGalleons}</div>
+                  <div>{formatDecimal(enteredKnuts, KNUTS_IN_SICKLE, 2)} {t.decimalSickles}</div>
+                  <div>{enteredKnuts} {t.decimalKnuts}</div>
+                </div>
+              </div>
+
+              <Button className="h-12 w-full rounded-2xl text-base" onClick={applyOperation} disabled={!canApply}>
+                <Coins className="mr-2 h-4 w-4" />
+                {mode === "add" && t.addToBalance}
+                {mode === "subtract" && t.subtractFromBalance}
+                {mode === "set" && t.setBalance}
+              </Button>
+
+              {!canApply && (
+                <div className="text-sm text-destructive">
+                  {t.insufficientFunds}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          <Card className="rounded-3xl shadow-sm">
+            <CardHeader>
+              <CardTitle>{t.recentOperations}</CardTitle>
+            </CardHeader>
+            <CardContent>
+              {history.length === 0 ? (
+                <div className="rounded-2xl border border-dashed p-6 text-sm text-muted-foreground">
+                  {t.historyEmpty}
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {history.map((item) => (
+                    <div key={item.id} className="rounded-2xl border p-4">
+                      <div className="flex items-center justify-between gap-3">
+                        <div className="font-medium">
+                          {item.type === "add" && t.addOp}
+                          {item.type === "subtract" && t.subtractOp}
+                          {item.type === "set" && t.setOp}
+                        </div>
+                        <Badge variant="outline" className="rounded-full">
+                          {item.time}
+                        </Badge>
+                      </div>
+                      <div className="mt-2 text-sm text-muted-foreground">
+                        {t.amount}: {formatTriplet(item.amount)}
+                      </div>
+                      <div className="text-sm text-muted-foreground">
+                        {t.newBalance}: {formatTriplet(item.result)}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </motion.div>
+      </div>
+    </div>
+  );
+}
+                  
