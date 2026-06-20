@@ -40,7 +40,7 @@
     .balance-big { font-size: clamp(28px, 5vw, 40px); font-weight: 800; margin-top: 6px; }
     .row { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
     .row-between { display:flex; justify-content: space-between; align-items:center; gap: 12px; flex-wrap: wrap; }
-    .tabs { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; }
+    .tabs { display: grid; grid-template-columns: repeat(4,1fr); gap: 10px; }
     .tab, button, select {
       border: 1px solid var(--border); background: var(--card-2); color: var(--text);
       border-radius: 18px; min-height: 48px; padding: 12px 16px; font: inherit;
@@ -120,11 +120,16 @@
           <button class="tab active" data-mode="add" id="tabAdd">Add</button>
           <button class="tab" data-mode="subtract" id="tabSubtract">Subtract</button>
           <button class="tab" data-mode="set" id="tabSet">Set</button>
+          <button class="tab" data-mode="divide" id="tabDivide">Divide</button>
         </div>
         <div class="inputs" style="margin-top: 14px;">
           <div><div class="small" style="margin-bottom: 6px;" id="inputGLabel">Galleons</div><input id="inputG" inputmode="numeric" value="0" /></div>
           <div><div class="small" style="margin-bottom: 6px;" id="inputSLabel">Sickles</div><input id="inputS" inputmode="numeric" value="0" /></div>
           <div><div class="small" style="margin-bottom: 6px;" id="inputKLabel">Knuts</div><input id="inputK" inputmode="numeric" value="0" /></div>
+        </div>
+        <div id="divideOptions" style="margin-top: 14px; display: none;">
+          <div class="small" style="margin-bottom: 6px;" id="divideByLabel">Divide by</div>
+          <input id="inputDivisor" inputmode="decimal" value="2" />
         </div>
         <div class="preview" style="margin-top: 14px;">
           <div class="label" id="enteredAmountLabel">Entered amount</div>
@@ -166,7 +171,8 @@
         resetInput: "Сброс ввода", clearAll: "Очистить всё", historyTitle: "Последние операции", historyEmpty: "История пока пустая.",
         amount: "Сумма", newBalance: "Новый баланс", addOp: "Пополнение", subtractOp: "Списание", setOp: "Установка баланса",
         footerNote: "Данные сохраняются локально на устройстве.", online: "Онлайн", offline: "Офлайн",
-        decimalGalleons: "гал.", decimalSickles: "сик.", decimalKnuts: "кн.", unitG: "г", unitS: "с", unitK: "к"
+        decimalGalleons: "гал.", decimalSickles: "сик.", decimalKnuts: "кн.", unitG: "г", unitS: "с", unitK: "к",
+        divide: "Деление", divideAmount: "Сумма для деления", divideBy: "Разделить на", divideResult: "Результат деления", calculateDivision: "Рассчитать деление"
       },
       en: {
         htmlLang: "en", wizardingBank: "⚡ Wizarding Bank", title: "Harry Potter Currency Calculator",
@@ -180,7 +186,8 @@
         resetInput: "Reset input", clearAll: "Clear all", historyTitle: "Recent operations", historyEmpty: "History is empty.",
         amount: "Amount", newBalance: "New balance", addOp: "Deposit", subtractOp: "Withdrawal", setOp: "Set balance",
         footerNote: "Data is stored locally on the device.", online: "Online", offline: "Offline",
-        decimalGalleons: "gal.", decimalSickles: "sic.", decimalKnuts: "kn.", unitG: "g", unitS: "s", unitK: "k"
+        decimalGalleons: "gal.", decimalSickles: "sic.", decimalKnuts: "kn.", unitG: "g", unitS: "s", unitK: "k",
+        divide: "Divide", divideAmount: "Amount to divide", divideBy: "Divide by", divideResult: "Division result", calculateDivision: "Calculate division"
       }
     };
 
@@ -196,9 +203,9 @@
       "wizardingBank","pageTitle","pageSubtitle","installHint","balanceTitle","balanceInGalleonsLabel","balanceInSicklesLabel",
       "balanceInKnutsLabel","galleonRate","sickleRate","baseUnit","normalizedBalanceLabel","galleonsLabel","sicklesLabel",
       "knutsLabel","operationTitle","languageLabel","languageSelect","tabAdd","tabSubtract","tabSet","inputGLabel","inputSLabel",
-      "inputKLabel","enteredAmountLabel","applyBtn","resetBtn","clearBtn","historyTitle","history","footerNote","onlineStatus",
+      "inputKLabel","divideByLabel","enteredAmountLabel","applyBtn","resetBtn","clearBtn","historyTitle","history","footerNote","onlineStatus",
       "balanceGalleons","balanceSickles","balanceKnuts","normalizedBalance","normG","normS","normK","inputG","inputS","inputK",
-      "enteredTriplet","enteredAsG","enteredAsS","enteredAsK"
+      "enteredTriplet","enteredAsG","enteredAsS","enteredAsK","tabDivide","divideOptions","inputDivisor"
     ].forEach(id => el[id] = document.getElementById(id));
 
     function t() { return translations[language]; }
@@ -221,7 +228,9 @@
       localStorage.setItem(LANGUAGE_KEY, language);
     }
     function enteredKnuts() { return toKnuts(el.inputG.value, el.inputS.value, el.inputK.value); }
-    function resetInputs() { el.inputG.value = "0"; el.inputS.value = "0"; el.inputK.value = "0"; renderEntered(); }
+    function divisorValue() { const n = Number(String(el.inputDivisor.value).replace(",", ".")); return Number.isFinite(n) && n > 0 ? n : 1; }
+    function divisionKnuts() { return Math.floor(enteredKnuts() / divisorValue()); }
+    function resetInputs() { el.inputG.value = "0"; el.inputS.value = "0"; el.inputK.value = "0"; el.inputDivisor.value = "2"; renderEntered(); }
     function pushHistory(type, amount, result) {
       history.unshift({ id: Date.now() + "-" + Math.random().toString(36).slice(2,8), type, amount, result, time: new Date().toLocaleString(language === "ru" ? "ru-RU" : "en-US") });
       history = history.slice(0, 12); save();
@@ -233,8 +242,8 @@
       el.balanceInSicklesLabel.textContent = tr.balanceInSickles; el.balanceInKnutsLabel.textContent = tr.balanceInKnuts; el.galleonRate.textContent = tr.galleonRate;
       el.sickleRate.textContent = tr.sickleRate; el.baseUnit.textContent = tr.baseUnit; el.normalizedBalanceLabel.textContent = tr.normalizedBalance;
       el.galleonsLabel.textContent = tr.galleons; el.sicklesLabel.textContent = tr.sickles; el.knutsLabel.textContent = tr.knuts; el.operationTitle.textContent = tr.operation;
-      el.languageLabel.textContent = tr.language; el.tabAdd.textContent = tr.add; el.tabSubtract.textContent = tr.subtract; el.tabSet.textContent = tr.set;
-      el.inputGLabel.textContent = tr.galleons; el.inputSLabel.textContent = tr.sickles; el.inputKLabel.textContent = tr.knuts; el.enteredAmountLabel.textContent = tr.enteredAmount;
+      el.languageLabel.textContent = tr.language; el.tabAdd.textContent = tr.add; el.tabSubtract.textContent = tr.subtract; el.tabSet.textContent = tr.set; el.tabDivide.textContent = tr.divide;
+      el.inputGLabel.textContent = tr.galleons; el.inputSLabel.textContent = tr.sickles; el.inputKLabel.textContent = tr.knuts; el.divideByLabel.textContent = tr.divideBy; el.enteredAmountLabel.textContent = mode === "divide" ? tr.divideAmount : tr.enteredAmount;
       el.resetBtn.textContent = tr.resetInput; el.clearBtn.textContent = tr.clearAll; el.historyTitle.textContent = tr.historyTitle; el.footerNote.textContent = tr.footerNote;
       el.onlineStatus.textContent = navigator.onLine ? tr.online : tr.offline; setMode(mode, false);
     }
@@ -244,7 +253,8 @@
       el.history.innerHTML = history.map(item => `<div class="history-item"><div class="row-between"><strong>${item.type === "add" ? tr.addOp : item.type === "subtract" ? tr.subtractOp : tr.setOp}</strong><span class="small">${item.time}</span></div><div class="small" style="margin-top: 8px;">${tr.amount}: ${formatTriplet(item.amount)}</div><div class="small">${tr.newBalance}: ${formatTriplet(item.result)}</div></div>`).join("");
     }
     function renderEntered() {
-      const value = enteredKnuts(), tr = t();
+      const value = mode === "divide" ? divisionKnuts() : enteredKnuts(), tr = t();
+      el.enteredAmountLabel.textContent = mode === "divide" ? tr.divideResult : tr.enteredAmount;
       el.enteredTriplet.textContent = formatTriplet(value);
       el.enteredAsG.textContent = dec(value, KNUTS_IN_GALLEON) + " " + tr.decimalGalleons;
       el.enteredAsS.textContent = dec(value, KNUTS_IN_SICKLE) + " " + tr.decimalSickles;
@@ -261,18 +271,20 @@
     function renderAll() { renderTexts(); renderBalance(); renderEntered(); renderHistory(); save(); }
     function setMode(next, rerender = true) {
       mode = next; document.querySelectorAll(".tab").forEach(btn => btn.classList.toggle("active", btn.dataset.mode === next));
-      const tr = t(); el.applyBtn.textContent = next === "add" ? tr.addToBalance : next === "subtract" ? tr.subtractFromBalance : tr.setBalance;
-      if (rerender) renderEntered();
+      const tr = t(); el.applyBtn.textContent = next === "add" ? tr.addToBalance : next === "subtract" ? tr.subtractFromBalance : next === "set" ? tr.setBalance : tr.calculateDivision;
+      el.divideOptions.style.display = next === "divide" ? "block" : "none";
+      if (rerender) { renderTexts(); renderEntered(); }
     }
 
     document.querySelectorAll(".tab").forEach(btn => btn.addEventListener("click", () => setMode(btn.dataset.mode)));
-    ["inputG","inputS","inputK"].forEach(id => document.getElementById(id).addEventListener("input", renderEntered));
+    ["inputG","inputS","inputK","inputDivisor"].forEach(id => document.getElementById(id).addEventListener("input", renderEntered));
     el.languageSelect.value = language;
     el.languageSelect.addEventListener("change", e => { language = e.target.value; save(); renderAll(); });
     el.resetBtn.addEventListener("click", resetInputs);
     el.clearBtn.addEventListener("click", () => { balanceKnuts = 0; history = []; localStorage.removeItem(STORAGE_KEY); localStorage.removeItem(HISTORY_KEY); resetInputs(); renderAll(); });
     el.applyBtn.addEventListener("click", () => {
       const value = enteredKnuts();
+      if (mode === "divide") { renderEntered(); return; }
       if (mode === "add") balanceKnuts += value;
       if (mode === "subtract") balanceKnuts = Math.max(0, balanceKnuts - value);
       if (mode === "set") balanceKnuts = Math.max(0, value);
